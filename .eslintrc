@@ -1,0 +1,33 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "prettier"
+    ],
+    "rules": {
+        "react/react-in-jsx-props": "off",
+        "react/no-unused-state": "warn",
+        "react/self-closing-comp": "warn",
+        "no-unused-vars": "warn"
+    }
+}
