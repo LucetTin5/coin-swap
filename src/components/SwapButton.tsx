@@ -2,12 +2,16 @@ import styled from "styled-components";
 
 interface Props {
   isActive: boolean;
-  onClick: () => void;
 }
 
-export const SwapButton = ({ isActive, onClick }: Props) => {
+export const SwapButton = ({ isActive }: Props) => {
+  const onClickHandler = () => {
+    if (isActive) {
+      alert("준비 중입니다");
+    }
+  };
   return (
-    <Button className={isActive ? "active" : ""} onClick={onClick} disabled={!isActive}>
+    <Button className={isActive ? "active" : ""} disabled={!isActive} onClick={onClickHandler}>
       {isActive ? "스왑" : "금액을 입력하세요"}
     </Button>
   );

@@ -1,33 +1,68 @@
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { TOKEN } from "../types/token";
+import { TOKENS_ARRAY } from "../constants/tokens";
+import { TokenListItem } from "./TokenListItem";
+import { useSavedTokens } from "../hooks/useSavedTokens";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
-export const SelectModal = () => {
+interface Props {
+  toggleModal: () => void;
+  setToken: React.Dispatch<React.SetStateAction<TOKEN>>;
+}
+
+export const SelectModal = ({ toggleModal, setToken }: Props) => {
+  const [tokens, setTokens] = useState(TOKENS_ARRAY.slice());
+  const [search, setSearch] = useState("");
+  const savedTokens = useSavedTokens();
+  const changeTokenHandler = (token: TOKEN) => {
+    setToken(token);
+    useLocalStorage(token);
+    toggleModal();
+  };
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (search === "") {
+        return setTokens(TOKENS_ARRAY.slice());
+      }
+      const filteredTokens = tokens.filter(token => token.includes(search));
+      if (filteredTokens.length === 0) {
+        alert("검색 결과가 없습니다");
+      } else {
+        setTokens(filteredTokens);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   return (
     <>
-      <Dimmed />
+      <Dimmed onClick={toggleModal} />
       <ModalWrapper>
         <ModalHeader>
           <span>토큰 선택</span>
-          <ModalCloseButton onClick={() => {}}>X</ModalCloseButton>
+          <ModalCloseButton onClick={toggleModal}>X</ModalCloseButton>
         </ModalHeader>
 
-        <ModalSearchInput placeholder="이름 검색" />
+        <ModalSearchInput placeholder="이름 검색" value={search} onChange={onSearchChange} />
 
         <SavedTokens>
-          <SavedToken>ETH</SavedToken>
+          {savedTokens &&
+            savedTokens.map(token => (
+              <SavedToken key={token} onClick={() => changeTokenHandler(token)}>
+                {token}
+              </SavedToken>
+            ))}
         </SavedTokens>
 
         <TokenListWrapper>
           <TokenList>
-            <TokenItem>
-              <TokenImageWrapper>
-                <TokenImage />
-              </TokenImageWrapper>
-              <TokenCode>
-                <span>ETH</span>
-                <span>Ether</span>
-              </TokenCode>
-              <TokenPrice>0.1698</TokenPrice>
-            </TokenItem>
+            {tokens.map(token => (
+              <TokenListItem key={token} token={token} onClick={changeTokenHandler} />
+            ))}
           </TokenList>
         </TokenListWrapper>
         <TokenListConfig onClick={() => alert("준비 중입니다")}>토큰 목록 관리</TokenListConfig>
@@ -81,12 +116,17 @@ const ModalSearchInput = styled.input`
   margin-bottom: 0.5rem;
 `;
 const SavedTokens = styled.div`
-  height: 10%;
+  min-height: 10%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 0.5rem;
 `;
 const SavedToken = styled.div`
   display: inline-block;
   border: 1px solid #777;
   color: #fff;
+  width: max-content;
+  border-radius: 0.5rem;
   font-size: 1.2rem;
   padding: 0.2rem 0.4rem;
   &:hover {
@@ -102,38 +142,7 @@ const TokenList = styled.ul`
   height: 100%;
   overflow-y: scroll;
 `;
-const TokenItem = styled.li`
-  display: grid;
-  grid-template-columns: 15% 1fr 1fr;
-  padding: 0.4rem 0;
-  &:hover {
-    background-color: #333;
-  }
-`;
-const TokenImageWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-const TokenImage = styled.img`
-  width: 2rem;
-  height: 2rem;
-`;
-const TokenCode = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  span:last-child {
-    font-size: 0.6rem;
-    color: #666;
-  }
-`;
-const TokenPrice = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 0.5rem;
-`;
+
 const TokenListConfig = styled.div`
   display: flex;
   width: 100%;

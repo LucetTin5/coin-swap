@@ -1,13 +1,14 @@
 import styled from "styled-components";
 
 interface Props {
+  currentToken: string;
   openModal: () => void;
 }
 
-export const CoinSelect = ({ openModal }: Props) => {
+export const CoinSelect = ({ currentToken, openModal }: Props) => {
   return (
     <SelectWrapper onClick={openModal}>
-      <span>ETH</span>
+      <span>{currentToken}</span>
       <span>⬇️</span>
     </SelectWrapper>
   );
